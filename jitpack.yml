@@ -1,3 +1,4 @@
 before_install:
-  - sdk install java 22.0.2-azul
-  - sdk use java 22.0.2-azul
+  - sdk update
+  - sdk install java 22.0.0-open
+  - sdk use java 22.0.0-open
