@@ -27,3 +27,8 @@ publishing {
 tasks.named("publishToMavenLocal").configure {
     dependsOn("assemble")
 }
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
