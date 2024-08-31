@@ -17,9 +17,10 @@ public interface Worker {
     }
 
     default void executeTask() {
-        for (int i = 0; i <= builder().getMaxTasksPerTick(); i++) {
+        for (int i = 0; i < builder().getMaxTasksPerTick(); i++) {
             BukkitWorkload workload = workloadQueue().poll();
             if (workload == null) {
+                System.out.println("Worlkoad is null");
                 if(builder().isStopWhenEmpty()) stop();
                 break;
             }
