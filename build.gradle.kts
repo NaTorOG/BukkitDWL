@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("java-library")
     id("maven-publish")
 }
 
@@ -14,6 +15,7 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
 }
+
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
@@ -24,10 +26,18 @@ publishing {
         }
     }
 }
+
 tasks.named("publishToMavenLocal").configure {
     dependsOn("assemble")
 }
+
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+    options.encoding = "UTF-8"
 }
 
