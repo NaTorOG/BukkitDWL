@@ -1,9 +1,10 @@
 plugins {
     id("java")
+    id("maven-publish")
 }
 
 group = "net.pino"
-version = "1.0-SNAPSHOT"
+val version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -13,7 +14,16 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
 }
-
-tasks.test {
-    useJUnitPlatform()
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = "com.github.NaTorOG"
+            artifactId = project.name
+            version = "1.0.0"
+        }
+    }
+}
+tasks.named("publishToMavenLocal").configure {
+    dependsOn("assemble")
 }
