@@ -3,7 +3,7 @@ package net.pino.api;
 import net.pino.AsyncBukkitDistributedWork;
 import net.pino.SyncBukkitDistributedWork;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
+
 
 public class LoadBuilder {
 
@@ -12,7 +12,7 @@ public class LoadBuilder {
         private boolean stopWhenEmpty = false;
         private Plugin plugin;
 
-        public @NotNull Plugin getPlugin() {
+        public Plugin getPlugin() {
             return plugin;
         }
         public int getMaxTasksPerTick() {
@@ -38,12 +38,12 @@ public class LoadBuilder {
             return this;
         }
 
-        public SyncBukkitDistributedWork buildSync(@NotNull Plugin plugin) {
+        public SyncBukkitDistributedWork buildSync(Plugin plugin) {
             this.plugin = plugin;
             return new SyncBukkitDistributedWork(this);
         }
 
-        public AsyncBukkitDistributedWork buildAsync(@NotNull Plugin plugin) {
+        public AsyncBukkitDistributedWork buildAsync(Plugin plugin) {
             this.plugin = plugin;
             return new AsyncBukkitDistributedWork(this);
         }
