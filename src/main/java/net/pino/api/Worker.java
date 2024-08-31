@@ -17,6 +17,7 @@ public interface Worker {
     }
 
     default void executeTask() {
+        builder().getPlugin().getLogger().info("Worker started");
         for (int i = 0; i < builder().getMaxTasksPerTick(); i++) {
             BukkitWorkload workload = workloadQueue().poll();
             if (workload == null) {
