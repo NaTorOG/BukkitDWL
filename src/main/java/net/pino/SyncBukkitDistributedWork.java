@@ -20,7 +20,7 @@ public class SyncBukkitDistributedWork implements Worker {
         this.workerTask = Bukkit.getScheduler().runTaskTimer(
                 builder.getPlugin(),
                 this::executeTask,
-                10,
+                builder().getInitialDelay(),
                 builder.getTickInterval());
     }
 

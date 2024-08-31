@@ -19,10 +19,10 @@ public class AsyncBukkitDistributedWork implements Worker {
 
     public AsyncBukkitDistributedWork(LoadBuilder builder) {
         this.builder = builder;
-        this.workerTask = Bukkit.getScheduler().runTaskTimer(
+        this.workerTask = Bukkit.getScheduler().runTaskTimerAsynchronously(
                 builder.getPlugin(),
                 this::executeTask,
-                10,
+                builder().getInitialDelay(),
                 builder.getTickInterval());
     }
 
