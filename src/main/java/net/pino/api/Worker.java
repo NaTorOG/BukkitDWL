@@ -17,11 +17,8 @@ public interface Worker {
     }
 
     default void executeTask() {
-        System.out.println("Queue size " + workloadQueue().size());
         for (int i = 0; i < builder().getMaxTasksPerTick(); i++) {
-            System.out.println("Queue size before poll: " + workloadQueue().size());
             BukkitWorkload workload = workloadQueue().poll();
-            System.out.println("Queue size after poll: " + workloadQueue().size());
             if (workload == null) {
                 if(builder().isStopWhenEmpty()) stop();
                 break;
