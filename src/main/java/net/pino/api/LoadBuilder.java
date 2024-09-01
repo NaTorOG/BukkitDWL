@@ -1,7 +1,6 @@
 package net.pino.api;
 
-import net.pino.AsyncBukkitDistributedWork;
-import net.pino.SyncBukkitDistributedWork;
+import net.pino.BukkitDistributedWork;
 import org.bukkit.plugin.Plugin;
 
 
@@ -11,6 +10,7 @@ public class LoadBuilder {
         private int interval = 1;
         private int initialDelay = 10;
         private boolean stopWhenEmpty = false;
+        private boolean isAsync;
         private Plugin plugin;
 
         public Plugin getPlugin() {
@@ -25,11 +25,14 @@ public class LoadBuilder {
         public int getInitialDelay() {
             return initialDelay;
         }
-        public boolean isStopWhenEmpty() {
+        public boolean shouldStopWhenEmpty() {
             return stopWhenEmpty;
         }
+        public boolean isAsync() {
+            return isAsync;
+        }
 
-        public LoadBuilder maxTasksPerTick(int maxTasksPerTick) {
+    public LoadBuilder maxTasksPerTick(int maxTasksPerTick) {
             this.maxTasksPerTick = maxTasksPerTick;
             return this;
         }
@@ -49,14 +52,16 @@ public class LoadBuilder {
             return this;
         }
 
-        public SyncBukkitDistributedWork buildSync(Plugin plugin) {
+        public BukkitDistributedWork buildSync(Plugin plugin) {
             this.plugin = plugin;
-            return new SyncBukkitDistributedWork(this);
+            this.isAsync = false;
+            return new BukkitDistributedWork(this);
         }
 
-        public AsyncBukkitDistributedWork buildAsync(Plugin plugin) {
+        public BukkitDistributedWork buildAsync(Plugin plugin) {
             this.plugin = plugin;
-            return new AsyncBukkitDistributedWork(this);
+            this.isAsync = true;
+            return new BukkitDistributedWork(this);
         }
 
     }
