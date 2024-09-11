@@ -3,6 +3,8 @@ package net.pino.api;
 import net.pino.BukkitDistributedWork;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -13,6 +15,7 @@ public class LoadBuilder {
         private int initialDelay = 10;
         private boolean stopWhenEmpty = false;
         private Runnable callback = null;
+        private final Set<BukkitWorkload> withInitialJobs = new HashSet<>();
         private boolean isAsync;
         private Plugin plugin;
 
@@ -36,6 +39,9 @@ public class LoadBuilder {
         }
         public Runnable getCallback() {
             return callback;
+        }
+        public Set<BukkitWorkload> getWithInitialJobs() {
+            return withInitialJobs;
         }
 
     public LoadBuilder maxTasksPerTick(int maxTasksPerTick) {
@@ -61,6 +67,11 @@ public class LoadBuilder {
         public LoadBuilder callback(Runnable callback) {
             if(!stopWhenEmpty) return this;
             this.callback = callback;
+            return this;
+        }
+
+        public LoadBuilder withInitialJobs(Set<BukkitWorkload> jobs) {
+            this.withInitialJobs.addAll(jobs);
             return this;
         }
 

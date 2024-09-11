@@ -21,6 +21,10 @@ public class BukkitDistributedWork {
     }
 
     private void start(){
+        if(!builder().getWithInitialJobs().isEmpty()){
+            workloadQueue().addAll(builder().getWithInitialJobs());
+        }
+
         if(builder().isAsync()){
             this.workerTask = Bukkit.getScheduler().runTaskTimerAsynchronously(
                     builder.getPlugin(),
