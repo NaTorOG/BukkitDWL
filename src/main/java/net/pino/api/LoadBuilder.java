@@ -3,6 +3,8 @@ package net.pino.api;
 import net.pino.BukkitDistributedWork;
 import org.bukkit.plugin.Plugin;
 
+import java.util.function.Consumer;
+
 
 public class LoadBuilder {
 
@@ -10,6 +12,7 @@ public class LoadBuilder {
         private int interval = 1;
         private int initialDelay = 10;
         private boolean stopWhenEmpty = false;
+        private Runnable callback = null;
         private boolean isAsync;
         private Plugin plugin;
 
@@ -31,6 +34,9 @@ public class LoadBuilder {
         public boolean isAsync() {
             return isAsync;
         }
+        public Runnable getCallback() {
+            return callback;
+        }
 
     public LoadBuilder maxTasksPerTick(int maxTasksPerTick) {
             this.maxTasksPerTick = maxTasksPerTick;
@@ -49,6 +55,12 @@ public class LoadBuilder {
 
         public LoadBuilder stopWhenEmpty() {
             this.stopWhenEmpty = true;
+            return this;
+        }
+
+        public LoadBuilder callback(Runnable callback) {
+            if(!stopWhenEmpty) return this;
+            this.callback = callback;
             return this;
         }
 
