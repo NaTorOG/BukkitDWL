@@ -7,6 +7,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.logging.Level;
 
 public class BukkitDistributedWork {
 
@@ -75,8 +76,11 @@ public class BukkitDistributedWork {
             }
             try {
                 workload.compute();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception exception) {
+                builder.getPlugin().getLogger()
+                        .log(Level.SEVERE, 
+                        "An error occurred while executing a workload, aborting...",
+                        exception);
                 stop();
             }
         }
