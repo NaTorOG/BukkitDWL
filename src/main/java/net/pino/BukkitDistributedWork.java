@@ -14,7 +14,6 @@ public class BukkitDistributedWork {
     private final LoadBuilder builder;
     private boolean isActive = false;
     private BukkitTask workerTask;
-    private boolean callbackIsAsync = false;
 
     public BukkitDistributedWork(LoadBuilder builder) {
         this.builder = builder;
@@ -23,45 +22,55 @@ public class BukkitDistributedWork {
 
     private void start(){
         if(!builder().getWithInitialJobs().isEmpty()){
-            workloadQueue().addAll(builder().getWithInitialJobs());
+            workloadQueue.addAll(builder().getWithInitialJobs());
         }
 
-        if(builder().isAsync()){
-            this.workerTask = Bukkit.getScheduler().runTaskTimerAsynchronously(
-                    builder.getPlugin(),
-                    this::executeTask,
-                    builder().getInitialDelay(),
-                    builder.getTickInterval());
-        }else{
-            this.workerTask = Bukkit.getScheduler().runTaskTimer(
-                    builder.getPlugin(),
-                    this::executeTask,
-                    builder().getInitialDelay(),
-                    builder.getTickInterval());
-        }
+
+        this.workerTask = builder.isAsync() ? Bukkit.getScheduler().runTaskTimerAsynchronously(
+                builder.getPlugin(),
+                this::executeTask,
+                builder().getInitialDelay(),
+                builder.getTickInterval()) :
+                Bukkit.getScheduler().runTaskTimer(
+                        builder.getPlugin(),
+                        this::executeTask,
+                        builder().getInitialDelay(),
+                        builder.getTickInterval());
+
+        setActive(true);
+
+
         setActive(true);
     }
 
     private void executeTask() {
         for (int i = 0; i < builder().getMaxTasksPerTick(); i++) {
-            BukkitWorkload workload = workloadQueue().poll();
+            BukkitWorkload workload = workloadQueue.poll();
+
             if (workload == null) {
                 if(builder().shouldStopWhenEmpty()){
-                    if(builder.getAsyncCallback() != null){
-                        builder.getAsyncCallback().thenAcceptAsync((result) -> {
-                            if(result) stop();
-                        }, Bukkit.getScheduler().getMainThreadExecutor(builder.getPlugin()));
-
-                    } else if (builder.getSyncCallback() != null) {
-                        builder.getSyncCallback().run();
+                    if(builder.getCallback() == null){
                         stop();
-                        
-                    }else{
-                        stop();
+                        return;
                     }
+
+                    if(builder.isCallbackAsync()) {
+                        Bukkit.getScheduler().runTaskAsynchronously(builder.getPlugin(), () -> {
+                            builder.getCallback().run();
+                            Bukkit.getScheduler().runTask(builder.getPlugin(), this::stop);
+                        });
+
+                        return;
+                    }
+
+                    Bukkit.getScheduler().getMainThreadExecutor(builder.getPlugin()).execute(() -> {
+                        builder.getCallback().run();
+                        stop();
+                    });
                 }
                 break;
             }
+
             workload.compute();
         }
     }

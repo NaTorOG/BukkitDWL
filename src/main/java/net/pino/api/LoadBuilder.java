@@ -14,11 +14,12 @@ public class LoadBuilder {
         private int interval = 1;
         private int initialDelay = 10;
         private boolean stopWhenEmpty = false;
-        private Runnable syncCallback = null;
-        private CompletionStage<Boolean> asyncCallback = null;
+        private Runnable callback = null;
         private final Set<BukkitWorkload> withInitialJobs = new HashSet<>();
         private boolean isAsync;
         private Plugin plugin;
+
+        private  boolean callbackIsAsync = false;
 
         public Plugin getPlugin() {
             return plugin;
@@ -38,12 +39,15 @@ public class LoadBuilder {
         public boolean isAsync() {
             return isAsync;
         }
-        public Runnable getSyncCallback() {
-            return syncCallback;
+
+        public boolean isCallbackAsync() {
+            return callbackIsAsync;
         }
-        public CompletionStage<Boolean> getAsyncCallback() {
-            return asyncCallback;
+
+        public Runnable getCallback() {
+            return callback;
         }
+
         public Set<BukkitWorkload> getWithInitialJobs() {
             return withInitialJobs;
         }
@@ -69,14 +73,17 @@ public class LoadBuilder {
         }
 
         public LoadBuilder callback(Runnable callback) {
-            if(!stopWhenEmpty) return this;
-            this.syncCallback = callback;
-            return this;
+            return this.callback(callback, false);
         }
 
-        public LoadBuilder callback(CompletionStage<Boolean> callback) {
+        public LoadBuilder callbackAsync(Runnable callback) {
+            return this.callback(callback, true);
+        }
+
+        protected LoadBuilder callback(Runnable callback, boolean callbackIsAsync) {
             if(!stopWhenEmpty) return this;
-            this.asyncCallback = callback;
+            this.callback = callback;
+            this.callbackIsAsync = callbackIsAsync;
             return this;
         }
 
