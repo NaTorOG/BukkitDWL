@@ -14,6 +14,7 @@ public class BukkitDistributedWork {
     private final LoadBuilder builder;
     private boolean isActive = false;
     private BukkitTask workerTask;
+    private boolean callbackIsAsync = false;
 
     public BukkitDistributedWork(LoadBuilder builder) {
         this.builder = builder;
@@ -46,12 +47,15 @@ public class BukkitDistributedWork {
             BukkitWorkload workload = workloadQueue().poll();
             if (workload == null) {
                 if(builder().shouldStopWhenEmpty()){
-                    if(builder.getCallback() != null){
-                        builder.getCallback()
-                                .thenRunAsync(
-                                        this::stop,
-                                        Bukkit.getScheduler().getMainThreadExecutor(builder().getPlugin())
-                                );
+                    if(builder.getAsyncCallback() != null){
+                        builder.getAsyncCallback().thenAcceptAsync((result) -> {
+                            if(result) stop();
+                        }, Bukkit.getScheduler().getMainThreadExecutor(builder.getPlugin()));
+
+                    } else if (builder.getSyncCallback() != null) {
+                        builder.getSyncCallback().run();
+                        stop();
+                        
                     }else{
                         stop();
                     }
