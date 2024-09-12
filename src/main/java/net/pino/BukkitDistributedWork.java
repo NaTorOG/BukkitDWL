@@ -73,7 +73,12 @@ public class BukkitDistributedWork {
             if (workload == null) {
                 break;
             }
-            workload.compute();
+            try {
+                workload.compute();
+            } catch (Exception e) {
+                e.printStackTrace();
+                stop();
+            }
         }
     }
 
