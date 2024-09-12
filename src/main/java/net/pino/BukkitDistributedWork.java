@@ -25,25 +25,25 @@ public class BukkitDistributedWork {
             workloadQueue.addAll(builder().getWithInitialJobs());
         }
 
-
-        this.workerTask = builder.isAsync() ? Bukkit.getScheduler().runTaskTimerAsynchronously(
+        setActive(true);
+        this.workerTask = builder.isAsync()
+                ? Bukkit.getScheduler().runTaskTimerAsynchronously(
                 builder.getPlugin(),
                 this::executeTask,
                 builder().getInitialDelay(),
-                builder.getTickInterval()) :
-                Bukkit.getScheduler().runTaskTimer(
+                builder.getTickInterval())
+
+                : Bukkit.getScheduler().runTaskTimer(
                         builder.getPlugin(),
                         this::executeTask,
                         builder().getInitialDelay(),
                         builder.getTickInterval());
-
-        setActive(true);
-
-
-        setActive(true);
     }
 
     private void executeTask() {
+        if(!isActive()) return;
+        if(workloadQueue.isEmpty()) return;
+
         for (int i = 0; i < builder().getMaxTasksPerTick(); i++) {
             BukkitWorkload workload = workloadQueue.poll();
 
@@ -56,8 +56,8 @@ public class BukkitDistributedWork {
 
                     if(builder.isCallbackAsync()) {
                         Bukkit.getScheduler().runTaskAsynchronously(builder.getPlugin(), () -> {
-                            builder.getCallback().run();
                             Bukkit.getScheduler().runTask(builder.getPlugin(), this::stop);
+                            builder.getCallback().run();
                         });
 
                         return;
@@ -68,7 +68,7 @@ public class BukkitDistributedWork {
                         stop();
                     });
                 }
-                break;
+                return;
             }
 
             workload.compute();
@@ -79,6 +79,7 @@ public class BukkitDistributedWork {
         if(workerTask() != null || !workerTask().isCancelled()){
             workerTask().cancel();
         }
+
         workloadQueue().clear();
         setActive(false);
     }
