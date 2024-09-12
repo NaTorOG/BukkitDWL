@@ -56,8 +56,8 @@ public class BukkitDistributedWork {
 
                     if(builder.isCallbackAsync()) {
                         Bukkit.getScheduler().runTaskAsynchronously(builder.getPlugin(), () -> {
-                            Bukkit.getScheduler().runTask(builder.getPlugin(), this::stop);
                             builder.getCallback().run();
+                            Bukkit.getScheduler().runTask(builder.getPlugin(), this::stop);
                         });
 
                         return;
