@@ -42,35 +42,37 @@ public class BukkitDistributedWork {
 
     private void executeTask() {
         if(!isActive()) return;
-        if(workloadQueue.isEmpty()) return;
+
+        if(workloadQueue.isEmpty()) {
+            isActive = false;
+            if(builder().shouldStopWhenEmpty()){
+                if(builder.getCallback() == null){
+                    stop();
+                    return;
+                }
+
+                if(builder.isCallbackAsync()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(builder.getPlugin(), () -> {
+                        builder.getCallback().run();
+                        Bukkit.getScheduler().runTask(builder.getPlugin(), this::stop);
+                    });
+
+                    return;
+                }
+
+                Bukkit.getScheduler().getMainThreadExecutor(builder.getPlugin()).execute(() -> {
+                    builder.getCallback().run();
+                    stop();
+                });
+            }
+            return;
+        }
 
         for (int i = 0; i < builder().getMaxTasksPerTick(); i++) {
             BukkitWorkload workload = workloadQueue.poll();
-
             if (workload == null) {
-                if(builder().shouldStopWhenEmpty()){
-                    if(builder.getCallback() == null){
-                        stop();
-                        return;
-                    }
-
-                    if(builder.isCallbackAsync()) {
-                        Bukkit.getScheduler().runTaskAsynchronously(builder.getPlugin(), () -> {
-                            builder.getCallback().run();
-                            Bukkit.getScheduler().runTask(builder.getPlugin(), this::stop);
-                        });
-
-                        return;
-                    }
-
-                    Bukkit.getScheduler().getMainThreadExecutor(builder.getPlugin()).execute(() -> {
-                        builder.getCallback().run();
-                        stop();
-                    });
-                }
-                return;
+                break;
             }
-
             workload.compute();
         }
     }
