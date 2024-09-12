@@ -5,6 +5,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 
 
@@ -14,7 +15,7 @@ public class LoadBuilder {
         private int interval = 1;
         private int initialDelay = 10;
         private boolean stopWhenEmpty = false;
-        private Runnable callback = null;
+        private CompletionStage<?> callback = null;
         private final Set<BukkitWorkload> withInitialJobs = new HashSet<>();
         private boolean isAsync;
         private Plugin plugin;
@@ -37,7 +38,7 @@ public class LoadBuilder {
         public boolean isAsync() {
             return isAsync;
         }
-        public Runnable getCallback() {
+        public CompletionStage<?> getCallback() {
             return callback;
         }
         public Set<BukkitWorkload> getWithInitialJobs() {
@@ -64,7 +65,7 @@ public class LoadBuilder {
             return this;
         }
 
-        public LoadBuilder callback(Runnable callback) {
+        public LoadBuilder callback(CompletionStage<?> callback) {
             if(!stopWhenEmpty) return this;
             this.callback = callback;
             return this;

@@ -46,11 +46,15 @@ public class BukkitDistributedWork {
             BukkitWorkload workload = workloadQueue().poll();
             if (workload == null) {
                 if(builder().shouldStopWhenEmpty()){
-
                     if(builder.getCallback() != null){
-                        builder.getCallback().run();
+                        builder.getCallback()
+                                .thenRunAsync(
+                                        this::stop,
+                                        Bukkit.getScheduler().getMainThreadExecutor(builder().getPlugin())
+                                );
+                    }else{
+                        stop();
                     }
-                    stop();
                 }
                 break;
             }

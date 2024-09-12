@@ -9,11 +9,11 @@ val version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 }
 
 publishing {
